@@ -1,11 +1,10 @@
-```html name=index.html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Script Fetcher</title>
+    <title>Draco AI</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,27 +19,45 @@
         }
 
         .chat-container {
+            display: flex;
+            flex-direction: column;
             background-color: #212121;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 400px;
             max-width: 100%;
+            height: 90vh;
             padding: 20px;
             box-sizing: border-box;
         }
 
         .chat-box {
-            height: 300px;
+            flex: 1;
             overflow-y: auto;
             border: 1px solid #333;
             border-radius: 10px;
             padding: 10px;
             margin-bottom: 10px;
             background-color: #1a1a1a;
+            scrollbar-width: thin;
+            scrollbar-color: #212121 #1a1a1a;
         }
 
         .chat-box p {
             margin: 5px 0;
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: #212121;
+            border-radius: 10px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background-color: #1a1a1a;
         }
 
         .input-box {
@@ -108,10 +125,6 @@
         <div class="input-box">
             <input type="text" id="chat-input" placeholder="Ask for a script...">
             <button onclick="sendMessage()">Send</button>
-        </div>
-        <div class="script-panel" id="script-panel">
-            <pre id="script-content"></pre>
-            <button onclick="copyToClipboard()">Copy</button>
         </div>
     </div>
 
@@ -213,15 +226,15 @@ local function createBox(target)
     game:GetService("RunService").RenderStepped:Connect(updateBox)
 end
 
-for _, player in pairs(game.Players:GetPlayers()) do
-    if player ~= game.Players.LocalPlayer then
-        createBox(player)
-    end
-end
+for (_, player in pairs(game.Players:GetPlayers())) do
+    if (player !== game.Players.LocalPlayer) {
+        createBox(player);
+    }
+}
 
-game.Players.PlayerAdded:Connect(function(player)
-    createBox(player)
-end)
+game.Players.PlayerAdded:Connect(function(player) {
+    createBox(player);
+});
 `,
             "name": `
 -- Name ESP Script
@@ -239,28 +252,28 @@ local function createNameTag(target)
     nameTag.TextStrokeTransparency = 0
 end
 
-for _, player in pairs(game.Players:GetPlayers()) do
-    if player ~= game.Players.LocalPlayer then
-        createNameTag(player)
-    end
-end
+for (_, player in pairs(game.Players.GetPlayers())) do
+    if (player !== game.Players.LocalPlayer) {
+        createNameTag(player);
+    }
+}
 
-game.Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
-        createNameTag(player)
-    end)
-end)
+game.Players.PlayerAdded:Connect(function(player) {
+    player.CharacterAdded:Connect(function() {
+        createNameTag(player);
+    });
+});
 `,
             "hitbox": `
 -- Hitbox Expander Script
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
-for _, part in pairs(character:GetChildren()) do
-    if part:IsA("BasePart") then
-        part.Size = part.Size * 2
-        part.Transparency = 0.5
-    end
+for (_, part in pairs(character:GetChildren())) do
+    if (part:IsA("BasePart")) {
+        part.Size = part.Size * 2;
+        part.Transparency = 0.5;
+    }
 end
 `,
             "invisible": `
@@ -270,27 +283,27 @@ local character = player.Character or player.CharacterAdded:Wait()
 
 local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
 
-if humanoidRootPart then
-    humanoidRootPart.Transparency = 1
-    humanoidRootPart.CanCollide = false
-    for _, part in pairs(character:GetChildren()) do
-        if part:IsA("BasePart") and part ~= humanoidRootPart then
-            part.Transparency = 1
-            part.CanCollide = false
-        end
+if (humanoidRootPart) {
+    humanoidRootPart.Transparency = 1;
+    humanoidRootPart.CanCollide = false;
+    for (_, part in pairs(character:GetChildren())) do
+        if (part:IsA("BasePart") && part !== humanoidRootPart) {
+            part.Transparency = 1;
+            part.CanCollide = false;
+        }
     end
-end
+}
 `,
             "tp": `
 -- Teleport Tool Script
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 
-mouse.Button1Down:Connect(function()
-    if mouse.Target then
-        player.Character:MoveTo(mouse.Hit.p)
-    end
-end)
+mouse.Button1Down:Connect(function() {
+    if (mouse.Target) {
+        player.Character:MoveTo(mouse.Hit.p);
+    }
+});
 `
         };
 
@@ -312,6 +325,9 @@ end)
             } else {
                 displayError('Script not found.');
             }
+
+            // Scroll to the bottom of the chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function getScriptName(message) {
@@ -336,10 +352,18 @@ end)
         }
 
         function typeScript(script) {
-            const scriptContent = document.getElementById('script-content');
-            const scriptPanel = document.getElementById('script-panel');
-            scriptContent.textContent = '';
-            scriptPanel.style.display = 'block';
+            const chatBox = document.getElementById('chat-box');
+            const scriptPanel = document.createElement('div');
+            scriptPanel.classList.add('script-panel');
+            chatBox.appendChild(scriptPanel);
+
+            const scriptContent = document.createElement('pre');
+            scriptPanel.appendChild(scriptContent);
+
+            const copyButton = document.createElement('button');
+            copyButton.textContent = 'Copy';
+            copyButton.onclick = () => copyToClipboard(scriptContent.textContent);
+            scriptPanel.appendChild(copyButton);
 
             let index = 0;
             const interval = setInterval(() => {
@@ -349,7 +373,10 @@ end)
                 } else {
                     clearInterval(interval);
                 }
-            }, 50); // Adjust the speed as needed
+            }, 12.5); // Typing speed adjusted to be 4 times faster
+
+            // Scroll to the bottom of the chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function displayError(error) {
@@ -359,10 +386,9 @@ end)
             chatBox.appendChild(errorMessage);
         }
 
-        function copyToClipboard() {
-            const scriptContent = document.getElementById('script-content');
+        function copyToClipboard(text) {
             const textArea = document.createElement('textarea');
-            textArea.value = scriptContent.textContent;
+            textArea.value = text;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
