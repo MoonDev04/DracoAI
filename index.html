@@ -225,15 +225,15 @@ local function createBox(target)
     game:GetService("RunService").RenderStepped:Connect(updateBox)
 end
 
-for _, player in pairs(game.Players:GetPlayers()) do
-    if player ~= game.Players.LocalPlayer then
+for (_, player in pairs(game.Players:GetPlayers())) do
+    if (player ~= game.Players.LocalPlayer) then
         createBox(player)
     end
 end
 
-game.Players.PlayerAdded:Connect(function(player)
+game.Players.PlayerAdded:Connect(function(player) {
     createBox(player)
-end)
+});
 `,
             "name": `
 -- Name ESP Script
@@ -251,17 +251,17 @@ local function createNameTag(target)
     nameTag.TextStrokeTransparency = 0
 end
 
-for _, player in pairs(game.Players:GetPlayers()) do
-    if player ~= game.Players.LocalPlayer then
-        createNameTag(player)
-    end
+for (_, player in pairs(game.Players:GetPlayers())) do
+    if (player ~= game.Players.LocalPlayer) {
+        createNameTag(player);
+    }
 end
 
-game.Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
-        createNameTag(player)
-    end)
-end)
+game.Players.PlayerAdded:Connect(function(player) {
+    player.CharacterAdded:Connect(function() {
+        createNameTag(player);
+    });
+});
 `,
             "hitbox": `
 -- Hitbox Expander Script
@@ -269,10 +269,10 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
 for (_, part in pairs(character:GetChildren())) do
-    if part:IsA("BasePart") then
-        part.Size = part.Size * 2
-        part.Transparency = 0.5
-    end
+    if (part:IsA("BasePart")) {
+        part.Size = part.Size * 2;
+        part.Transparency = 0.5;
+    }
 end
 `,
             "invisible": `
@@ -286,10 +286,10 @@ if humanoidRootPart then
     humanoidRootPart.Transparency = 1
     humanoidRootPart.CanCollide = false
     for (_, part in pairs(character:GetChildren())) do
-        if part:IsA("BasePart") and part ~= humanoidRootPart then
-            part.Transparency = 1
-            part.CanCollide = false
-        end
+        if (part:IsA("BasePart") && part ~= humanoidRootPart) {
+            part.Transparency = 1;
+            part.CanCollide = false;
+        }
     end
 end
 `,
@@ -298,11 +298,11 @@ end
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 
-mouse.Button1Down:Connect(function()
-    if mouse.Target then
-        player.Character:MoveTo(mouse.Hit.p)
-    end
-end)
+mouse.Button1Down:Connect(function() {
+    if (mouse.Target) {
+        player.Character:MoveTo(mouse.Hit.p);
+    }
+});
 `
         };
 
@@ -372,7 +372,7 @@ end)
                 } else {
                     clearInterval(interval);
                 }
-            }, 25); // Typing speed adjusted to be 2 times faster
+            }, 8); // Typing speed adjusted to be 3 times faster than before
 
             // Scroll to the bottom of the chat box
             chatBox.scrollTop = chatBox.scrollHeight;
