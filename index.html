@@ -1,3 +1,4 @@
+```html name=index.html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,45 +20,27 @@
         }
 
         .chat-container {
-            display: flex;
-            flex-direction: column;
             background-color: #212121;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 400px;
             max-width: 100%;
-            height: 90vh;
             padding: 20px;
             box-sizing: border-box;
         }
 
         .chat-box {
-            flex: 1;
+            height: 300px;
             overflow-y: auto;
             border: 1px solid #333;
             border-radius: 10px;
             padding: 10px;
             margin-bottom: 10px;
             background-color: #1a1a1a;
-            scrollbar-width: thin;
-            scrollbar-color: #212121 #1a1a1a;
         }
 
         .chat-box p {
             margin: 5px 0;
-        }
-
-        .chat-box::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb {
-            background-color: #212121;
-            border-radius: 10px;
-        }
-
-        .chat-box::-webkit-scrollbar-track {
-            background-color: #1a1a1a;
         }
 
         .input-box {
@@ -126,6 +109,10 @@
             <input type="text" id="chat-input" placeholder="Ask for a script...">
             <button onclick="sendMessage()">Send</button>
         </div>
+        <div class="script-panel" id="script-panel">
+            <pre id="script-content"></pre>
+            <button onclick="copyToClipboard()">Copy</button>
+        </div>
     </div>
 
     <script>
@@ -166,30 +153,31 @@ end)
 local players = game:GetService("Players")
 local player = players.LocalPlayer
 local mouse = player:GetMouse()
-local target = nil
+local target = null
 
-mouse.Button2Down:Connect(function()
-    local closest = math.huge
-    for i, v in pairs(players:GetPlayers()) do
-        if v ~= player and v.Character and v.Character:FindFirstChild("Head") then
-            local distance = (v.Character.Head.Position - player.Character.Head.Position).magnitude
-            if distance < closest then
-                closest = distance
-                target = v
-            end
-        end
-    end
-end)
+mouse.Button2Down:Connect(function() {
+    let closest = math.huge;
+    for (let i in players.GetPlayers()) {
+        const v = players.GetPlayers()[i];
+        if (v !== player && v.Character && v.Character.FindFirstChild("Head")) {
+            const distance = (v.Character.Head.Position - player.Character.Head.Position).magnitude;
+            if (distance < closest) {
+                closest = distance;
+                target = v;
+            }
+        }
+    }
+});
 
-mouse.Button2Up:Connect(function()
-    target = nil
-end)
+mouse.Button2Up:Connect(function() {
+    target = null;
+});
 
-game:GetService("RunService").RenderStepped:Connect(function()
-    if target and target.Character and target.Character:FindFirstChild("Head") then
-        mouse.Hit = target.Character.Head.CFrame
-    end
-end)
+game.GetService("RunService").RenderStepped.Connect(function() {
+    if (target && target.Character && target.Character.FindFirstChild("Head")) {
+        mouse.Hit = target.Character.Head.CFrame;
+    }
+});
 `,
             "walkspeed": `
 -- Walkspeed Changer Script
@@ -225,15 +213,15 @@ local function createBox(target)
     game:GetService("RunService").RenderStepped:Connect(updateBox)
 end
 
-for (_, player in pairs(game.Players:GetPlayers())) do
-    if (player ~= game.Players.LocalPlayer) then
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
         createBox(player)
     end
 end
 
-game.Players.PlayerAdded:Connect(function(player) {
+game.Players.PlayerAdded:Connect(function(player)
     createBox(player)
-});
+end)
 `,
             "name": `
 -- Name ESP Script
@@ -251,28 +239,28 @@ local function createNameTag(target)
     nameTag.TextStrokeTransparency = 0
 end
 
-for (_, player in pairs(game.Players:GetPlayers())) do
-    if (player ~= game.Players.LocalPlayer) {
-        createNameTag(player);
-    }
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        createNameTag(player)
+    end
 end
 
-game.Players.PlayerAdded:Connect(function(player) {
-    player.CharacterAdded:Connect(function() {
-        createNameTag(player);
-    });
-});
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        createNameTag(player)
+    end)
+end)
 `,
             "hitbox": `
 -- Hitbox Expander Script
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
-for (_, part in pairs(character:GetChildren())) do
-    if (part:IsA("BasePart")) {
-        part.Size = part.Size * 2;
-        part.Transparency = 0.5;
-    }
+for _, part in pairs(character:GetChildren()) do
+    if part:IsA("BasePart") then
+        part.Size = part.Size * 2
+        part.Transparency = 0.5
+    end
 end
 `,
             "invisible": `
@@ -285,11 +273,11 @@ local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
 if humanoidRootPart then
     humanoidRootPart.Transparency = 1
     humanoidRootPart.CanCollide = false
-    for (_, part in pairs(character:GetChildren())) do
-        if (part:IsA("BasePart") && part ~= humanoidRootPart) {
-            part.Transparency = 1;
-            part.CanCollide = false;
-        }
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part ~= humanoidRootPart then
+            part.Transparency = 1
+            part.CanCollide = false
+        end
     end
 end
 `,
@@ -298,11 +286,11 @@ end
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 
-mouse.Button1Down:Connect(function() {
-    if (mouse.Target) {
-        player.Character:MoveTo(mouse.Hit.p);
-    }
-});
+mouse.Button1Down:Connect(function()
+    if mouse.Target then
+        player.Character:MoveTo(mouse.Hit.p)
+    end
+end)
 `
         };
 
@@ -324,9 +312,6 @@ mouse.Button1Down:Connect(function() {
             } else {
                 displayError('Script not found.');
             }
-
-            // Scroll to the bottom of the chat box
-            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function getScriptName(message) {
@@ -351,18 +336,10 @@ mouse.Button1Down:Connect(function() {
         }
 
         function typeScript(script) {
-            const chatBox = document.getElementById('chat-box');
-            const scriptPanel = document.createElement('div');
-            scriptPanel.classList.add('script-panel');
-            chatBox.appendChild(scriptPanel);
-
-            const scriptContent = document.createElement('pre');
-            scriptPanel.appendChild(scriptContent);
-
-            const copyButton = document.createElement('button');
-            copyButton.textContent = 'Copy';
-            copyButton.onclick = () => copyToClipboard(scriptContent.textContent);
-            scriptPanel.appendChild(copyButton);
+            const scriptContent = document.getElementById('script-content');
+            const scriptPanel = document.getElementById('script-panel');
+            scriptContent.textContent = '';
+            scriptPanel.style.display = 'block';
 
             let index = 0;
             const interval = setInterval(() => {
@@ -372,10 +349,7 @@ mouse.Button1Down:Connect(function() {
                 } else {
                     clearInterval(interval);
                 }
-            }, 8); // Typing speed adjusted to be 3 times faster than before
-
-            // Scroll to the bottom of the chat box
-            chatBox.scrollTop = chatBox.scrollHeight;
+            }, 50); // Adjust the speed as needed
         }
 
         function displayError(error) {
@@ -385,9 +359,10 @@ mouse.Button1Down:Connect(function() {
             chatBox.appendChild(errorMessage);
         }
 
-        function copyToClipboard(text) {
+        function copyToClipboard() {
+            const scriptContent = document.getElementById('script-content');
             const textArea = document.createElement('textarea');
-            textArea.value = text;
+            textArea.value = scriptContent.textContent;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
