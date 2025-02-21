@@ -152,31 +152,30 @@ end)
 local players = game:GetService("Players")
 local player = players.LocalPlayer
 local mouse = player:GetMouse()
-local target = null
+local target = nil
 
-mouse.Button2Down:Connect(function() {
-    let closest = math.huge;
-    for (let i in players.GetPlayers()) {
-        const v = players.GetPlayers()[i];
-        if (v !== player && v.Character && v.Character.FindFirstChild("Head")) {
-            const distance = (v.Character.Head.Position - player.Character.Head.Position).magnitude;
-            if (distance < closest) {
-                closest = distance;
-                target = v;
-            }
-        }
-    }
-});
+mouse.Button2Down:Connect(function()
+    local closest = math.huge
+    for i, v in pairs(players:GetPlayers()) do
+        if v ~= player and v.Character and v.Character:FindFirstChild("Head") then
+            local distance = (v.Character.Head.Position - player.Character.Head.Position).magnitude
+            if distance < closest then
+                closest = distance
+                target = v
+            end
+        end
+    end
+end)
 
-mouse.Button2Up:Connect(function() {
-    target = null;
-});
+mouse.Button2Up:Connect(function()
+    target = nil
+end)
 
-game.GetService("RunService").RenderStepped.Connect(function() {
-    if (target && target.Character && target.Character.FindFirstChild("Head")) {
-        mouse.Hit = target.Character.Head.CFrame;
-    }
-});
+game:GetService("RunService").RenderStepped:Connect(function()
+    if target and target.Character and target.Character:FindFirstChild("Head") then
+        mouse.Hit = target.Character.Head.CFrame
+    end
+end)
 `,
             "walkspeed": `
 -- Walkspeed Changer Script
@@ -255,7 +254,7 @@ end)
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
-for _, part in pairs(character:GetChildren()) do
+for (_, part in pairs(character:GetChildren())) do
     if part:IsA("BasePart") then
         part.Size = part.Size * 2
         part.Transparency = 0.5
@@ -272,7 +271,7 @@ local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
 if humanoidRootPart then
     humanoidRootPart.Transparency = 1
     humanoidRootPart.CanCollide = false
-    for _, part in pairs(character:GetChildren()) do
+    for (_, part in pairs(character:GetChildren())) do
         if part:IsA("BasePart") and part ~= humanoidRootPart then
             part.Transparency = 1
             part.CanCollide = false
@@ -348,7 +347,7 @@ end)
                 } else {
                     clearInterval(interval);
                 }
-            }, 50); // Adjust the speed as needed
+            }, 25); // Typing speed adjusted to be 2 times faster
         }
 
         function displayError(error) {
