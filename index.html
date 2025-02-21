@@ -8,7 +8,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #151515;
+            color: #f4f4f4;
             margin: 0;
             padding: 0;
             display: flex;
@@ -18,9 +19,9 @@
         }
 
         .chat-container {
-            background-color: #fff;
+            background-color: #212121;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 400px;
             max-width: 100%;
             padding: 20px;
@@ -30,10 +31,11 @@
         .chat-box {
             height: 300px;
             overflow-y: auto;
-            border: 1px solid #ddd;
+            border: 1px solid #333;
             border-radius: 10px;
             padding: 10px;
             margin-bottom: 10px;
+            background-color: #1a1a1a;
         }
 
         .chat-box p {
@@ -47,13 +49,15 @@
         .input-box input {
             flex: 1;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #333;
             border-radius: 10px 0 0 10px;
+            background-color: #1a1a1a;
+            color: #f4f4f4;
         }
 
         .input-box button {
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #333;
             background-color: #007bff;
             color: #fff;
             border-radius: 0 10px 10px 0;
@@ -67,14 +71,16 @@
         .script-panel {
             margin-top: 20px;
             padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
             border-radius: 10px;
+            display: none;
         }
 
         .script-panel pre {
             white-space: pre-wrap;
             word-break: break-word;
+            color: #f4f4f4;
         }
 
         .script-panel button {
@@ -102,7 +108,7 @@
             <input type="text" id="chat-input" placeholder="Ask for a script...">
             <button onclick="sendMessage()">Send</button>
         </div>
-        <div class="script-panel" id="script-panel" style="display: none;">
+        <div class="script-panel" id="script-panel">
             <pre id="script-content"></pre>
             <button onclick="copyToClipboard()">Copy</button>
         </div>
@@ -125,15 +131,13 @@
         }
 
         function fetchScript(topic) {
-            // Replace with the actual URL and parameters to fetch the script from scriptblox.com
-            const url = `https://scriptblox.com/api/getScript?topic=${encodeURIComponent(topic)}`;
+            const url = `https://scriptblox.com/api/script?search=${encodeURIComponent(topic)}`;
 
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    const scriptContent = data.script; // Adjust based on actual API response
-
-                    if (scriptContent) {
+                    if (data && data.scripts && data.scripts.length > 0) {
+                        const scriptContent = data.scripts[0].content; // Adjust based on actual API response
                         displayScript(scriptContent);
                     } else {
                         displayError('Script not found.');
