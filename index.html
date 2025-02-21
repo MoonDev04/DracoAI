@@ -115,37 +115,199 @@
     </div>
 
     <script>
+        const scripts = {
+            "fly": `
+-- Fly Script
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local flying = false
+local speed = 50
+
+mouse.KeyDown:connect(function(key)
+    if key == "e" then
+        flying = not flying
+        if flying then
+            local bodyGyro = Instance.new("BodyGyro", player.Character.HumanoidRootPart)
+            local bodyVelocity = Instance.new("BodyVelocity", player.Character.HumanoidRootPart)
+            bodyGyro.P = 9e4
+            bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+            bodyGyro.CFrame = player.Character.HumanoidRootPart.CFrame
+            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            while flying do
+                wait()
+                player.Character.Humanoid.PlatformStand = true
+                bodyVelocity.Velocity = (player.Character.HumanoidRootPart.CFrame.lookVector * speed)
+                bodyGyro.CFrame = CFrame.new(mouse.Hit.p)
+            end
+            player.Character.Humanoid.PlatformStand = false
+            bodyGyro:Destroy()
+            bodyVelocity:Destroy()
+        end
+    end
+end)
+`,
+            "aim lock": `
+-- Aim Lock Script
+local players = game:GetService("Players")
+local player = players.LocalPlayer
+local mouse = player:GetMouse()
+local target = nil
+
+mouse.Button2Down:Connect(function()
+    local closest = math.huge
+    for i, v in pairs(players:GetPlayers()) do
+        if v ~= player and v.Character and v.Character:FindFirstChild("Head") then
+            local distance = (v.Character.Head.Position - player.Character.Head.Position).magnitude
+            if distance < closest then
+                closest = distance
+                target = v
+            end
+        end
+    end
+end)
+
+mouse.Button2Up:Connect(function()
+    target = nil
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if target and target.Character and target.Character:FindFirstChild("Head") then
+        mouse.Hit = target.Character.Head.CFrame
+    end
+end)
+`,
+            "walkspeed": `
+-- Walkspeed Changer Script
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+character.Humanoid.WalkSpeed = 100 -- Change the value to your desired speed
+`,
+            "box esp": `
+-- Box ESP Script
+local function createBox(target)
+    local box = Drawing.new("Square")
+    box.Visible = true
+    box.Color = Color3.fromRGB(255, 0, 0)
+    box.Thickness = 2
+    box.Transparency = 1
+    
+    local function updateBox()
+        if target and target.Character and target.Character:FindFirstChild("Head") then
+            local head = target.Character.Head
+            local headPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                box.Size = Vector2.new(2000 / headPos.Z, 3000 / headPos.Z)
+                box.Position = Vector2.new(headPos.X - box.Size.X / 2, headPos.Y - box.Size.Y / 2)
+            else
+                box.Visible = false
+            end
+        else
+            box.Visible = false
+        end
+    end
+    
+    game:GetService("RunService").RenderStepped:Connect(updateBox)
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        createBox(player)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    createBox(player)
+end)
+`,
+            "name": `
+-- Name ESP Script
+local function createNameTag(target)
+    local bill = Instance.new("BillboardGui", target.Character.Head)
+    bill.Size = UDim2.new(1, 0, 1, 0)
+    bill.Adornee = target.Character.Head
+    bill.AlwaysOnTop = true
+
+    local nameTag = Instance.new("TextLabel", bill)
+    nameTag.Size = UDim2.new(1, 0, 1, 0)
+    nameTag.Text = target.Name
+    nameTag.BackgroundTransparency = 1
+    nameTag.TextColor3 = Color3.fromRGB(255, 0, 0)
+    nameTag.TextStrokeTransparency = 0
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        createNameTag(player)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        createNameTag(player)
+    end)
+end)
+`,
+            "hitbox": `
+-- Hitbox Expander Script
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+for _, part in pairs(character:GetChildren()) do
+    if part:IsA("BasePart") then
+        part.Size = part.Size * 2
+        part.Transparency = 0.5
+    end
+end
+`,
+            "invisible": `
+-- Invisible Script
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+
+if humanoidRootPart then
+    humanoidRootPart.Transparency = 1
+    humanoidRootPart.CanCollide = false
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part ~= humanoidRootPart then
+            part.Transparency = 1
+            part.CanCollide = false
+        end
+    end
+end
+`,
+            "tp": `
+-- Teleport Tool Script
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+
+mouse.Button1Down:Connect(function()
+    if mouse.Target then
+        player.Character:MoveTo(mouse.Hit.p)
+    end
+end)
+`
+        };
+
         async function sendMessage() {
             const chatBox = document.getElementById('chat-box');
             const chatInput = document.getElementById('chat-input');
-            const message = chatInput.value;
+            const message = chatInput.value.trim().toLowerCase();
 
-            if (message.trim() === '') return;
+            if (message === '') return;
 
             const userMessage = document.createElement('p');
             userMessage.textContent = `You: ${message}`;
             chatBox.appendChild(userMessage);
             chatInput.value = '';
 
-            await fetchScript(message);
-        }
-
-        async function fetchScript(topic) {
-            const url = `https://api.github.com/search/code?q=${encodeURIComponent(topic)}+in:file+language:lua`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data.items && data.items.length > 0) {
-                    const scriptUrl = data.items[0].html_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '');
-                    const scriptContent = await fetch(scriptUrl).then(res => res.text());
-                    displayScript(scriptContent);
-                } else {
-                    displayError('Script not found.');
-                }
-            } catch (error) {
-                displayError('Failed to fetch the script.');
+            if (scripts[message]) {
+                displayScript(scripts[message]);
+            } else {
+                displayError('Script not found.');
             }
         }
 
